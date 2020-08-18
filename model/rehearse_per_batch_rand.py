@@ -483,4 +483,4 @@ class Net(nn.Module):
             print("ring buffer is full, re-estimating of the constrains, we are at task", t)
             self.old_mem_grads = None
             self.cosine_sim = [1] * self.n_constraints
-            self.select_samples_per_group(t)
+            self.select_random_samples(t)
