@@ -182,7 +182,7 @@ def life_experience(model, continuum, x_te, args):
     current_res_per_t=[]#per task accuracy up until the current task
     current_avg_acc_list=[]#avg accuracy on task seen so far
     current_task = 0
-    time_start = time.time()
+    time_start = time.process_time()
 
     for (i, (x, t, y)) in enumerate(continuum):
         if t>args.tasks_to_preserve:
@@ -215,7 +215,7 @@ def life_experience(model, continuum, x_te, args):
     current_avg_acc_list.append(current_avg_acc)
     result_all.append(res_all)
 
-    time_end = time.time()
+    time_end = time.process_time()
     time_spent = time_end - time_start
 
     return torch.Tensor(result_t), torch.Tensor(result_a),torch.Tensor(result_all),torch.Tensor(current_res_per_t),torch.Tensor(current_avg_acc_list),res_on_mem, time_spent
@@ -350,10 +350,10 @@ if __name__ == "__main__":
     if args.cuda:
         model.cuda()
     if args.shared_head:
-        model.is_cifar=False
+        model.is_cifar = False
         model.nc_per_task = n_outputs
     # run model on continuum
-    result_t, result_a, avg_accuracy,current_res_per_t,current_avg,accurcy_on_mem ,spent_time= life_experience(
+    result_t, result_a, avg_accuracy,current_res_per_t, current_avg,accurcy_on_mem, spent_time = life_experience(
         model, continuum, x_te, args)
 
     # prepare saving path and file name
@@ -366,6 +366,11 @@ if __name__ == "__main__":
     one_liner = str(vars(args)) + ' # '
     one_liner += ' '.join(["%.3f" % stat for stat in stats])
     print(model.fname + ': ' + one_liner + ' # ' + str(spent_time))
+
+    # save spent time
+    with open(model.fname+'.txt', 'w') as f:
+        f.wrtie({}.format(spent_time))
+
 
     # save all results in binary file
     torch.save((result_t, result_a, model.state_dict(),current_res_per_t,current_avg,
