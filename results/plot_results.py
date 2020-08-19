@@ -92,14 +92,14 @@ for dataset in datasets:
 
     x_ind = np.arange(len(y_acc))
 
-    plt.figure(figsize=(7, 3))
+    plt.figure(figsize=(7, 4))
     all_colors = []
     for xi, yi, li in zip(x_ind, y_acc, x_lab):
         plt.bar(xi, yi, label=names_models[li], color=colors[li])
         all_colors.append(colors[li])
     plt.bar(x_ind + (len(y_acc) + 1) * 1, y_bwt, color=all_colors)
     plt.bar(x_ind + (len(y_acc) + 1) * 2, y_fwt, color=all_colors)
-    plt.xticks([2, 8, 14], ['ACC', 'BWT', 'FWT'], fontsize=16)
+    plt.xticks([3.5, 11.5, 19.5], ['ACC', 'BWT', 'FWT'], fontsize=16)
     plt.yticks(fontsize=16)
     plt.xlim(-1, len(y_acc) * 3 + 2)
     plt.ylabel('classification accuracy', fontsize=16)
@@ -121,13 +121,13 @@ for dataset in datasets:
 
 for dataset in datasets:
 
-    plt.figure(figsize=(7, 3))
+    plt.figure(figsize=(7, 4))
     for model in models:
         if model in evoplot[dataset]:
             x = np.arange(len(evoplot[dataset][model]))
             x = (x - x.min()) / (x.max() - x.min()) * 20
             plt.plot(x, evoplot[dataset][model], color=colors[model], lw=3)
-            plt.xticks(range(0, 21, 2))
+            plt.xticks(range(0, 5, 1))
 
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
