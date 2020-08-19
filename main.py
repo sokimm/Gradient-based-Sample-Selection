@@ -369,7 +369,7 @@ if __name__ == "__main__":
 
     # save spent time
     with open(model.fname+'.txt', 'w') as f:
-        f.wrtie({}.format(spent_time))
+        f.write({}.format(spent_time))
 
 
     # save all results in binary file
