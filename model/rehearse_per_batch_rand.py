@@ -349,7 +349,7 @@ class Net(nn.Module):
 
         # allocate ring buffer
         self.memory_data = torch.FloatTensor(self.n_memories, n_inputs)
-        self.memory_labs = torch.LongTensor(self.n_memories)
+        self.memory_labs = torch.LongTensor(self.n_memories,)
         # allocate  selected  memory
         self.sampled_memory_data = None
         self.sampled_memory_labs = None
@@ -395,20 +395,20 @@ class Net(nn.Module):
 
         task = 0
         self.mem_grads = None
-        self.sampled_memory_data = None
-        self.sampled_memory_labs = None
+        #self.sampled_memory_data = None
+        #self.sampled_memory_labs = None
         for index in inds:
             task = index / self.n_memories
             task_index = index % self.n_memories
             if not self.sampled_memory_data is None:
 
                 self.sampled_memory_data = torch.cat(
-                    (self.sampled_memory_data, self.memory_data[task][task_index].unsqueeze(0)), dim=0)
+                    (self.sampled_memory_data, self.memory_data[task_index].unsqueeze(0)), dim=0)
                 self.sampled_memory_labs = torch.cat(
-                    (self.sampled_memory_labs, self.memory_labs[task][task_index].unsqueeze(0)), dim=0)
+                    (self.sampled_memory_labs, self.memory_labs[task_index].unsqueeze(0)), dim=0)
             else:
-                self.sampled_memory_data = self.memory_data[task][task_index].unsqueeze(0)
-                self.sampled_memory_labs = self.memory_labs[task][task_index].unsqueeze(0)
+                self.sampled_memory_data = self.memory_data[task_index].unsqueeze(0)
+                self.sampled_memory_labs = self.memory_labs[task_index].unsqueeze(0)
 
         print("selected labels are", self.sampled_memory_labs)
 
@@ -419,12 +419,6 @@ class Net(nn.Module):
         for t in range(task+1):
 
             print('task number ',t,'samples in buffer',torch.eq(self.sampled_memory_taskids,t).nonzero().size(0))
-
-
-
-
-
-
 
 
     # MAIN TRAINING FUNCTION
