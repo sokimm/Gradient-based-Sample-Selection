@@ -342,8 +342,7 @@ class Net(nn.Module):
         self.n_sampled_memories = args.n_sampled_memories
         self.n_constraints = args.n_constraints
         self.gpu = args.cuda
-
-        self.batch_size=args.batch_size
+        self.batch_size = args.batch_size
         self.n_iter = args.n_iter
 
 
@@ -353,7 +352,7 @@ class Net(nn.Module):
         # allocate  selected  memory
         self.sampled_memory_data = None
         self.sampled_memory_labs = None
-        self.sampled_memory_taskids=None
+        self.sampled_memory_taskids = None
         # allocate selected constraints
         self.constraints_data = None
         self.constraints_labs = None
@@ -379,6 +378,14 @@ class Net(nn.Module):
         output = self.net(x)
 
         return output
+
+    def print_taskids_stats(self, task):
+
+        tasks=torch.unique(self.sampled_memory_taskids)
+        for t in range(task+1):
+
+            print('task number ',t,'samples in buffer',torch.eq(self.sampled_memory_taskids,t).nonzero().size(0))
+
 
     def select_random_samples(self, task):
         """
@@ -413,17 +420,6 @@ class Net(nn.Module):
         print("selected labels are", self.sampled_memory_labs)
 
 
-    def print_taskids_stats(self,task):
-
-        tasks=torch.unique(self.sampled_memory_taskids)
-        for t in range(task+1):
-
-            print('task number ',t,'samples in buffer',torch.eq(self.sampled_memory_taskids,t).nonzero().size(0))
-
-
-
-
-
 
 
 
@@ -453,7 +449,7 @@ class Net(nn.Module):
         if self.sampled_memory_data is not None:
             shuffeled_inds=torch.randperm(self.sampled_memory_labs.size(0))
             effective_batch_size=min(self.n_constraints,self.sampled_memory_labs.size(0))
-            b_index=0
+            b_index = 0
         for iter_i in range(self.n_iter):
 
             # get gradients on previous constraints
