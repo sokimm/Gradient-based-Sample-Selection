@@ -19,7 +19,6 @@ from metrics.metrics import confusion_matrix
 
 # continuum iterator #########################################################
 
-
 def load_datasets(args):
 
     print("path",args.data_path + '/' + args.data_file)
@@ -30,7 +29,6 @@ def load_datasets(args):
         n_outputs = max(n_outputs, d_tr[i][2].max().item())
         n_outputs = max(n_outputs, d_te[i][2].max().item())
     return d_tr, d_te, n_inputs, n_outputs + 1, len(d_tr)
-
 
 class Continuum:
 
@@ -99,10 +97,7 @@ class Continuum:
 
 # train handle ###############################################################
 
-
-
-
-def eval_tasks(model, tasks,current_task, args):
+def eval_tasks(model, tasks, current_task, args):
     """
     it also evaluates the performance of the model on samples from all the tasks and gives the average performance on all the samples regardless of their task
     :param model:
@@ -135,9 +130,9 @@ def eval_tasks(model, tasks,current_task, args):
                 yb = y[b_from:b_to]
             if args.cuda:
                 xb = xb.cuda()
+            # accuracy
             _, pb = torch.max(model(xb, t).data.cpu(), 1, keepdim=False)
             rt += (pb == yb).float().sum()
-
 
         result.append(rt / x.size(0))
 
@@ -148,14 +143,13 @@ def eval_tasks(model, tasks,current_task, args):
             current_result=[res for res in result]
             current_avg_acc=total_pred / total_size
 
-
     print("###################### EVAL BEGIN ##########################")
     print(result)
 
     print("###################### EVAL ENDS ##########################")
     torch.save(( model.state_dict(),current_result,current_avg_acc), model.fname + '.pt')
 
-    return result,total_pred/total_size,current_avg_acc,current_avg_acc
+    return result, total_pred/total_size, current_avg_acc, current_avg_acc
 
 def eval_on_memory(args):
     """
@@ -189,7 +183,7 @@ def life_experience(model, continuum, x_te, args):
             break
         if(((i % args.log_every) == 0) or (t != current_task)):
 
-            res_per_t,res_all,current_result,current_avg_acc=eval_tasks(model, x_te,current_task, args)
+            res_per_t, res_all, current_result, current_avg_acc = eval_tasks(model, x_te, current_task, args)
             result_a.append(res_per_t)
             result_all.append(res_all)
             result_t.append(current_task)
@@ -207,7 +201,7 @@ def life_experience(model, continuum, x_te, args):
         model.train()
         model.observe(v_x, t, v_y)
 
-    res_per_t, res_all,current_result,current_avg_acc = eval_tasks(model, x_te, args.tasks_to_preserve,args)
+    res_per_t, res_all, current_result, current_avg_acc = eval_tasks(model, x_te, args.tasks_to_preserve, args)
     res_on_mem=eval_on_memory(args)
     result_a.append(res_per_t)
     result_t.append(current_task)
@@ -218,8 +212,7 @@ def life_experience(model, continuum, x_te, args):
     time_end = time.process_time()
     time_spent = time_end - time_start
 
-    return torch.Tensor(result_t), torch.Tensor(result_a),torch.Tensor(result_all),torch.Tensor(current_res_per_t),torch.Tensor(current_avg_acc_list),res_on_mem, time_spent
-
+    return torch.Tensor(result_t), torch.Tensor(result_a), torch.Tensor(result_all), torch.Tensor(current_res_per_t), torch.Tensor(current_avg_acc_list),res_on_mem, time_spent
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Continuum learning')
@@ -326,8 +319,8 @@ if __name__ == "__main__":
 
     if args.cuda:
         torch.cuda.manual_seed_all(args.seed)
-    # load data
 
+    # load data
     x_tr, x_te, n_inputs, n_outputs, n_tasks = load_datasets(args)
 
     # set up continuum
@@ -360,7 +353,6 @@ if __name__ == "__main__":
     if not os.path.exists(args.save_path):
         os.makedirs(args.save_path)
 
-
     # save confusion matrix and print one line of stats
     stats = confusion_matrix(result_t, result_a,avg_accuracy,accurcy_on_mem,args.tasks_to_preserve, model.fname+'.txt')
     one_liner = str(vars(args)) + ' # '
@@ -368,9 +360,8 @@ if __name__ == "__main__":
     print(model.fname + ': ' + one_liner + ' # ' + str(spent_time))
 
     # save spent time
-    with open(model.fname+'.txt', 'w') as f:
-        f.write({}.format(spent_time))
-
+    with open(model.fname+'.txt', 'a') as f:
+        f.write("spend time: {}".format(str(spent_time)))
 
     # save all results in binary file
     torch.save((result_t, result_a, model.state_dict(),current_res_per_t,current_avg,
